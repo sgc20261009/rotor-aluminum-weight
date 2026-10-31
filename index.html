@@ -3,187 +3,605 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>270转子冲片，JXQ-10-8A 转子铁芯充铝重量计算</title>
+<title>转子充铝重量计算</title>
 <style>
-  :root {
-    --bg: #070d16;
-    --bg2: #0b1422;
-    --panel: #0f1d30;
-    --panel2: #13243b;
-    --border: #1e3553;
-    --text: #e8f1fb;
-    --text-dim: #8ba3bf;
-    --cyan: #35e0ff;
-    --blue: #3a7bff;
-    --brand: #3a7bff;
-    --warn: #ffb454;
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2c313c;
+    --text:#e6e8ec; --muted:#9aa3b2; --accent:#7f77dd; --accent2:#1d9e75;
+    --danger:#e24b4a; --inputbg:#0c0e12;
+    --alu:#9fc6e8; --alu-edge:#5b8fc0; --iron:#3a4150; --shaft:#0c0e12;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: radial-gradient(1200px 600px at 50% -10%, #122544 0%, var(--bg) 60%);
-    color: var(--text);
-    line-height: 1.7;
-    min-height: 100vh;
-    padding-bottom: 60px;
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f4f5f7; --panel:#ffffff; --panel2:#f0f2f5; --border:#d8dce3;
+      --text:#1d2129; --muted:#5f6675; --accent:#534ab7; --accent2:#0f6e56;
+      --danger:#a32d2d; --inputbg:#ffffff;
+      --alu:#7fb3e0; --alu-edge:#3f7bb5; --iron:#c9ced6; --shaft:#cfd4dc;
+    }
   }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
-  header.hero {
-    padding: 56px 20px 36px; text-align: center;
-  }
-  .tag {
-    display: inline-block; font-size: 13px; color: var(--cyan);
-    border: 1px solid var(--border); background: var(--panel);
-    padding: 5px 14px; border-radius: 999px; margin-bottom: 18px;
-    letter-spacing: .5px;
-  }
-  .hero h1 {
-    font-size: clamp(24px, 4.4vw, 38px); font-weight: 800; line-height: 1.3;
-    background: linear-gradient(135deg, #fff, var(--cyan));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .hero p.sub { color: var(--text-dim); margin-top: 14px; font-size: 15px; }
-
-  section { margin: 26px auto; }
-  .card {
-    background: linear-gradient(180deg, var(--panel), var(--bg2));
-    border: 1px solid var(--border); border-radius: 16px;
-    padding: 28px; box-shadow: 0 16px 40px rgba(0,0,0,.35);
-  }
-  h2 {
-    font-size: 20px; margin-bottom: 18px; padding-left: 12px;
-    border-left: 3px solid var(--cyan);
-  }
-
-  /* 计算区 */
-  .calc-grid { display: grid; grid-template-columns: 1fr; gap: 22px; }
-  .field label {
-    display: block; font-size: 14px; color: var(--text-dim); margin-bottom: 8px;
-  }
-  .field .hint { font-size: 12.5px; color: var(--text-dim); margin-top: 8px; }
-  .field input {
-    width: 100%; font-size: 18px; color: var(--text);
-    background: var(--panel2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 16px; outline: none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  .field input:focus {
-    border-color: var(--cyan);
-    box-shadow: 0 0 0 3px rgba(53,224,255,.15);
-  }
-  .result {
-    text-align: center; padding: 24px;
-    background: linear-gradient(135deg, rgba(53,224,255,.10), rgba(58,123,255,.10));
-    border: 1px solid var(--border); border-radius: 14px;
-  }
-  .result .label { font-size: 13px; color: var(--text-dim); letter-spacing: .5px; }
-  .result .value {
-    font-size: 46px; font-weight: 800; line-height: 1.2; margin-top: 6px;
-    color: var(--cyan); text-shadow: 0 0 24px rgba(53,224,255,.35);
-  }
-  .result .unit { font-size: 16px; color: var(--text-dim); margin-left: 6px; font-weight: 500; }
-  .result .err { color: var(--warn); font-size: 15px; font-weight: 600; }
-
-  .formula {
-    margin-top: 22px; padding: 20px;
-    background: var(--panel2); border: 1px dashed var(--border); border-radius: 12px;
-    text-align: center;
-  }
-  .formula .ftitle { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; letter-spacing: .5px; }
-  .formula .ftext {
-    font-size: 20px; font-weight: 700; color: var(--text);
-    font-family: "Cascadia Code", "Consolas", "SFMono-Regular", monospace;
-  }
-  .formula .ftext b { color: var(--cyan); }
-  .formula .fnote { font-size: 12.5px; color: var(--text-dim); margin-top: 10px; }
-
-  /* 免责声明 */
-  .disclaimer {
-    margin-top: 8px; padding: 22px 24px;
-    background: #0c1420; border: 1px solid var(--border); border-radius: 14px;
-    color: var(--text-dim); font-size: 13.5px; line-height: 1.85;
-  }
-  .disclaimer .dt {
-    color: var(--text); font-weight: 700; display: block; margin-bottom: 10px;
-    font-size: 15px;
-  }
-
-  footer {
-    text-align: center; color: var(--text-dim); font-size: 12.5px;
-    margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--border);
-  }
-  @media (max-width: 560px) {
-    .result .value { font-size: 38px; }
-    .formula .ftext { font-size: 16px; }
-  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .card h2{font-size:15px;margin:0 0 12px;font-weight:600}
+  label{display:block;margin:10px 0 4px;color:var(--muted);font-size:13px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > div{flex:1;min-width:120px}
+  input,select,textarea{width:100%;background:var(--inputbg);border:1px solid var(--border);
+    color:var(--text);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .seg-row{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .seg-row select,.seg-row input{width:auto;flex:1;min-width:60px}
+  .seg-row .lab{font-size:12px;color:var(--muted);min-width:54px}
+  button{background:var(--accent);color:#fff;border:none;border-radius:8px;
+    padding:8px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+  button.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+  button.danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+  .btn-sm{padding:5px 10px;font-size:12px}
+  .result{background:var(--panel2);border-radius:10px;padding:14px;margin-top:6px}
+  .result .item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border)}
+  .result .item:last-child{border-bottom:none}
+  .result .v{font-weight:600;color:var(--accent2);font-variant-numeric:tabular-nums}
+  .reward{display:flex;justify-content:center;margin-top:14px}
+  .reward button{background:linear-gradient(135deg,#ff7a45,#ff4d4f);color:#fff;border:none;
+    padding:10px 26px;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;
+    box-shadow:0 4px 14px rgba(255,77,79,.35);transition:transform .12s,box-shadow .12s}
+  .reward button:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(255,77,79,.45)}
+  .reward button:active{transform:translateY(0)}
+  .big{font-size:22px;color:var(--accent)!important}
+  .preview{display:flex;justify-content:center;align-items:center;background:var(--panel2);
+    border-radius:10px;padding:10px;margin-top:10px}
+  .preview svg{width:100%;max-width:360px;height:auto}
+  .note{color:var(--muted);font-size:12px;margin-top:8px}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--border);
+    border-radius:20px;padding:2px 10px;font-size:12px;color:var(--muted);margin-left:6px}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .tab{background:var(--panel2);border:1px solid var(--border);border-radius:8px;
+    padding:6px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .hide{display:none}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:12px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
+  .ring-end{border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0}
+  .sub2{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:6px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 </style>
 </head>
 <body>
-<header class="hero">
-  <span class="tag">270 转子冲片 · 充铝重量计算</span>
-  <h1>270转子冲片，JXQ-10-8A 转子铁芯充铝重量计算</h1>
-  <p class="sub">输入铁芯长度，按标定系数自动算出转子铁芯充铝重量（单位：kg）</p>
-</header>
-
 <div class="wrap">
-  <!-- 计算区 -->
-  <section class="card">
-    <h2>转子铁芯充铝重量计算</h2>
-    <div class="calc-grid">
-      <div class="field">
-        <label for="len">铁芯长度（mm）</label>
-        <input id="len" type="number" inputmode="decimal" step="any" min="0"
-               placeholder="请输入铁芯长度，例如 100" autocomplete="off">
-        <div class="hint">提示：冲片单片厚度 0.35mm，单片充铝重量 0.0031kg；长度按毫米（mm）填写。</div>
+  <h1>转子充铝重量计算</h1>
+  <div class="sub">槽铝重 = 槽截面积 × 铁心长 × 铝密度 × 槽数 ｜ 可选两端端环 ｜ 槽型与转子冲片一致（分段法）</div>
+
+  <!-- 参数存取工具栏 -->
+  <div class="toolbar">
+    <button class="ghost btn-sm" id="btnSave">保存参数</button>
+    <button class="ghost btn-sm" id="btnLoad">读取参数</button>
+    <button class="ghost btn-sm" id="btnExport">导出文件</button>
+    <button class="ghost btn-sm" id="btnImport">导入文件</button>
+    <input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+    <span class="note" id="ioMsg" style="margin:0"></span>
+  </div>
+
+  <!-- 剖面预览（置顶） -->
+  <div class="card" style="margin-bottom:16px">
+    <h2>充铝剖面预览 <span class="pill">铁心内 Z 个槽已充满铝</span></h2>
+    <div class="preview" style="margin-top:0"><div id="svgBox"></div></div>
+    <div class="legend">
+      <span><i style="background:var(--alu)"></i>铝（槽导体 + 端环）</span>
+      <span><i style="background:var(--iron)"></i>转子铁心</span>
+      <span><i style="background:var(--shaft)"></i>轴孔</span>
+    </div>
+    <div class="note" id="warn"></div>
+  </div>
+
+  <div class="grid">
+    <!-- 左列：基本参数 -->
+    <div class="card">
+      <h2>基本参数</h2>
+      <div class="row">
+        <div><label>槽数 Z</label><input id="Z" type="number" value="16" step="1"></div>
+        <div><label>铁心长 L (mm)</label><input id="L" type="number" value="100" step="0.5"></div>
+      </div>
+      <div class="row">
+        <div>
+          <label>铝密度 ρ (g/cm³)</label>
+          <select id="mat">
+            <option value="2.70">纯铝 2.70</option>
+            <option value="2.69">铸铝 ZL101/ADC12 ≈2.69</option>
+            <option value="2.68">铸铝合金 2.68</option>
+            <option value="custom">自定义…</option>
+          </select>
+        </div>
+        <div><label>自定义 ρ</label><input id="rho" type="number" value="2.70" step="0.01"></div>
+      </div>
+      <div class="row">
+        <div><label>转子外径 D (mm，仅绘图）</label><input id="D" type="number" value="169" step="0.1"></div>
+        <div><label>轴孔 d (mm，仅绘图）</label><input id="d" type="number" value="45" step="0.1"></div>
+      </div>
+      <div class="row">
+        <div><label>铸铝填充率 η (0~1)</label><input id="eta" type="number" value="1.00" step="0.01" min="0" max="1"></div>
+      </div>
+      <div class="note">铸铝填充率 η：实际铝条截面积 = 槽截面积 × η（考虑未充满/气孔），仅作用于槽铝重；端环、风叶、平衡柱为实心铸造，η=1。</div>
+      <div class="note">铝重只与「槽截面积 × 铁心长 × 密度 × 槽数」有关；D、d 仅用于绘制剖面（铁心与轴孔外观）。</div>
+    </div>
+
+    <!-- 右列：槽型 -->
+    <div class="card">
+      <h2>槽型定义 <span class="pill">半闭口平底异形 → 用「分段」</span></h2>
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-t="segment">分段（通用）</div>
+        <div class="tab" data-t="rect">矩形</div>
+        <div class="tab" data-t="trap">梯形</div>
+        <div class="tab" data-t="round">圆底</div>
       </div>
 
-      <div class="result">
-        <div class="label">转子铁芯充铝重量</div>
-        <div id="out"><span class="err">请输入铁芯长度</span></div>
+      <!-- 分段 -->
+      <div id="panel-segment">
+        <div class="note">自上而下拆段：矩形填「宽/高」，梯形填「上宽→下宽/高」，圆底段填「底半径」（建议放最后）。</div>
+        <div id="segList"></div>
+        <button class="ghost btn-sm" id="addSeg">+ 添加段</button>
       </div>
 
-      <div class="formula">
-        <div class="ftitle">计算公式（下方固定展示）</div>
-        <div class="ftext">重量(kg) = 铁芯长度 ÷ <b>0.35</b> × <b>0.0031</b></div>
-        <div class="fnote">即：每 0.35mm 叠厚对应 0.0031kg；长度单位 mm，结果单位 kg。</div>
+      <!-- 矩形 -->
+      <div id="panel-rect" class="hide">
+        <div class="row">
+          <div><label>槽宽 w (mm)</label><input id="r_w" type="number" value="6" step="0.1"></div>
+          <div><label>槽高 h (mm)</label><input id="r_h" type="number" value="27" step="0.1"></div>
+        </div>
+      </div>
+
+      <!-- 梯形 -->
+      <div id="panel-trap" class="hide">
+        <div class="row">
+          <div><label>上宽 b0</label><input id="t_b0" type="number" value="0.5" step="0.1"></div>
+          <div><label>下宽 b1</label><input id="t_b1" type="number" value="6.6" step="0.1"></div>
+          <div><label>高 h</label><input id="t_h" type="number" value="27" step="0.1"></div>
+        </div>
+      </div>
+
+      <!-- 圆底 -->
+      <div id="panel-round" class="hide">
+        <div class="row">
+          <div><label>槽口宽 b0</label><input id="rd_b0" type="number" value="2" step="0.1"></div>
+          <div><label>颈部高 h0</label><input id="rd_h0" type="number" value="2" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div><label>身宽 b（底宽=2r）</label><input id="rd_b" type="number" value="8" step="0.1"></div>
+          <div><label>总高 h</label><input id="rd_h" type="number" value="20" step="0.1"></div>
+        </div>
+        <div class="note">底为半圆，半径 r = 身宽/2；扩张段高 = h − h0 − r（自动推算）</div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- 免责声明 -->
-  <section class="disclaimer">
-    <span class="dt">免责声明</span>
-    免责声明：本站为个人博客，博客所发布的一切软件的文章仅限用于学习和研究目的；不得将上述内容用于商业或者非法用途，否则，一切后果请用户自负。本站信息来自网络，版权争议与本站无关，您必须在下载后的24个小时之内，从您的电脑中彻底删除上述内容。访问和下载本站内容，说明您已同意上述条款。本站为非盈利性站点，本站不贩卖软件，所有内容不作为商业行为。
-  </section>
+  <!-- 端环 + 结果 -->
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h2>端环 / 风叶 / 平衡柱（铸铝转子两端，可不选）</h2>
+      <label style="display:flex;align-items:center;gap:6px;margin:6px 0">
+        <input type="checkbox" id="ringOn" style="width:auto"> 启用端环（两端各一铝环，连接所有槽）
+      </label>
 
-  <footer>
-    本页面为 JXQ-10-8A 转子铁芯充铝重量计算的非官方工具页，计算公式以实际工艺标定为准。
-  </footer>
+      <div class="ring-end">
+        <div class="sub2">端环 A（自由端）</div>
+        <div class="row">
+          <div><label>外径 Do (mm)</label><input id="rA_Do" type="number" value="169" step="0.1"></div>
+          <div><label>内径 Di (mm)</label><input id="rA_Di" type="number" value="45" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div><label>高度 h (mm)</label><input id="rA_h" type="number" value="12" step="0.1"></div>
+          <div><label>拔模度 α (°)</label><input id="rA_a" type="number" value="0" step="0.5"></div>
+        </div>
+      </div>
+
+      <div class="ring-end">
+        <div class="sub2">端环 B（另一侧）</div>
+        <div class="row">
+          <div><label>外径 Do (mm)</label><input id="rB_Do" type="number" value="169" step="0.1"></div>
+          <div><label>内径 Di (mm)</label><input id="rB_Di" type="number" value="45" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div><label>高度 h (mm)</label><input id="rB_h" type="number" value="12" step="0.1"></div>
+          <div><label>拔模度 α (°)</label><input id="rB_a" type="number" value="0" step="0.5"></div>
+        </div>
+      </div>
+      <div class="note">拔模度 α：自由端取输入直径，向铁心端按 α 收口（截锥，内外壁同步收口）；α=0 即直环（矩形截面）。两端可填不同参数。</div>
+
+      <label style="display:flex;align-items:center;gap:6px;margin:10px 0 4px">
+        <input type="checkbox" id="fanOn" style="width:auto"> 启用风叶（铸在端环端面，与平衡柱同面）
+      </label>
+      <div class="row">
+        <div><label>数量 Nb（每端）</label><input id="fanN" type="number" value="12" step="1"></div>
+      </div>
+      <div class="row">
+        <div><label>径向长 hb (mm)</label><input id="fanHb" type="number" value="20" step="0.5"></div>
+        <div><label>轴向高 wb (mm)</label><input id="fanWb" type="number" value="8" step="0.5"></div>
+        <div><label>切向厚 tb (mm)</label><input id="fanTb" type="number" value="3" step="0.1"></div>
+      </div>
+      <div class="row">
+        <div><label>拔模度 αb (°)</label><input id="fanA" type="number" value="0" step="0.5"></div>
+      </div>
+
+      <label style="display:flex;align-items:center;gap:6px;margin:10px 0 4px">
+        <input type="checkbox" id="pillarOn" style="width:auto"> 启用平衡柱（铸在端环上）
+      </label>
+      <div class="row">
+        <div><label>数量 Np（每端）</label><input id="pillarN" type="number" value="6" step="1"></div>
+      </div>
+      <div class="row">
+        <div><label>底径 dp (mm)</label><input id="pillarD" type="number" value="10" step="0.1"></div>
+        <div><label>高度 hp (mm)</label><input id="pillarH" type="number" value="10" step="0.1"></div>
+        <div><label>拔模度 αp (°)</label><input id="pillarA" type="number" value="0" step="0.5"></div>
+      </div>
+
+      <div class="note">风叶、平衡柱均铸在两端端环的<b>同一端面上</b>（风叶由外缘向内延伸、平衡柱在环面上），权重按「每端数量×2」计入总充铝重；在每个端环上，风叶与平衡柱<b>错开均布</b>（沿圆周交替、等间距排布，互不重叠）。风叶按 αb 收口（切向厚由 tb 收到 tb−hb·tanαb，取平均厚算体积）；平衡柱按 αp 收口为截锥（底径 dp，顶径 dp−2·hp·tanαp）。三者与槽铝、端环相加得总充铝重。</div>
+      <div class="preview" id="ringPreview" style="margin-top:10px"><div id="ringBox"></div></div>
+      <div class="note" id="ringMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>计算结果</h2>
+      <div class="result" id="result">
+        <div class="item"><span>单槽截面积</span><span class="v" id="o_slot">—</span></div>
+        <div class="item"><span>单槽铝体积 (×L×η)</span><span class="v" id="o_vslot">—</span></div>
+        <div class="item"><span>槽铝总重 (Z 条)</span><span class="v" id="o_bar">—</span></div>
+        <div class="item"><span>端环 A 铝重</span><span class="v" id="o_ringA">0.00 g</span></div>
+        <div class="item"><span>端环 B 铝重</span><span class="v" id="o_ringB">0.00 g</span></div>
+        <div class="item"><span>风叶铝重（两端合计）</span><span class="v" id="o_fan">0.00 g</span></div>
+        <div class="item"><span>平衡柱铝重（两端合计）</span><span class="v" id="o_pillar">0.00 g</span></div>
+        <div class="item"><span>总充铝重</span><span class="v big" id="o_total">—</span></div>
+      </div>
+      <div class="note">重量单位：克(g)；≥1000g 自动换算为千克(kg)。体积单位 mm³。密度默认 2.70 g/cm³。</div>
+      <div class="reward">
+        <button id="rewardBtn" type="button">💖 打赏支持</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-  const lenInput = document.getElementById('len');
-  const out = document.getElementById('out');
+const $ = id => document.getElementById(id);
 
-  function calc() {
-    const raw = lenInput.value.trim();
-    if (raw === '') {
-      out.innerHTML = '<span class="err">请输入铁芯长度</span>';
-      return;
+// ---------- 分段槽型数据（与转子冲片一致）----------
+let segments = [
+  {type:'rect', w:0.5, h:1},
+  {type:'trap', w1:0.5, w2:6.6, h:15},
+  {type:'trap', w1:6.6, w2:3, h:11},
+];
+
+function renderSegs(){
+  const box = $('segList'); box.innerHTML='';
+  segments.forEach((s,i)=>{
+    const div = document.createElement('div'); div.className='seg-row';
+    const typeSel = `<select data-i="${i}" data-k="__type" style="flex:0 0 auto;min-width:64px">
+        <option value="rect"${s.type==='rect'?' selected':''}>矩形</option>
+        <option value="trap"${s.type==='trap'?' selected':''}>梯形</option>
+        <option value="round"${s.type==='round'?' selected':''}>圆底</option>
+      </select>`;
+    let fields='';
+    if(s.type==='rect'){
+      fields=`<input type="number" step="0.1" value="${s.w}" data-i="${i}" data-k="w" placeholder="宽">
+        <input type="number" step="0.1" value="${s.h}" data-i="${i}" data-k="h" placeholder="高">`;
+    } else if(s.type==='trap'){
+      fields=`<input type="number" step="0.1" value="${s.w1}" data-i="${i}" data-k="w1" placeholder="上宽">
+        <input type="number" step="0.1" value="${s.w2}" data-i="${i}" data-k="w2" placeholder="下宽">
+        <input type="number" step="0.1" value="${s.h}" data-i="${i}" data-k="h" placeholder="高">`;
+    } else {
+      fields=`<input type="number" step="0.1" value="${s.r}" data-i="${i}" data-k="r" placeholder="底半径">`;
     }
-    const L = Number(raw);
-    if (!isFinite(L) || L < 0) {
-      out.innerHTML = '<span class="err">请输入有效的非负数值</span>';
-      return;
-    }
-    const w = L / 0.35 * 0.0031;
-    out.innerHTML = w.toLocaleString('zh-CN', { maximumFractionDigits: 4 })
-      + '<span class="unit">kg</span>';
+    div.innerHTML = typeSel + fields + `<button class="danger btn-sm" data-del="${i}">删</button>`;
+    box.appendChild(div);
+  });
+  box.querySelectorAll('select[data-k="__type"]').forEach(el=>{
+    el.addEventListener('change',e=>{
+      const i=+e.target.dataset.i, ty=e.target.value;
+      segments[i]={rect:{type:'rect',w:3,h:5},trap:{type:'trap',w1:3,w2:3,h:5},round:{type:'round',r:3}}[ty];
+      renderSegs(); compute();
+    });
+  });
+  box.querySelectorAll('input').forEach(el=>{
+    el.addEventListener('input',e=>{
+      const i=+e.target.dataset.i, k=e.target.dataset.k;
+      segments[i][k]=parseFloat(e.target.value)||0; compute();
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click',e=>{ segments.splice(+e.target.dataset.del,1); renderSegs(); compute(); });
+  });
+}
+$('addSeg').addEventListener('click',()=>{ segments.push({type:'trap',w1:3,w2:3,h:5}); renderSegs(); compute(); });
+
+// ---------- 槽型切换 ----------
+let slotType='segment';
+document.querySelectorAll('#tabs .tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active'); slotType=t.dataset.t;
+    ['segment','rect','trap','round'].forEach(p=>$( 'panel-'+p).classList.add('hide'));
+    $('panel-'+slotType).classList.remove('hide'); compute();
+  });
+});
+
+// ---------- 几何 ----------
+function shoelace(pts){
+  let a=0; for(let i=0;i<pts.length;i++){const j=(i+1)%pts.length;a+=pts[i].x*pts[j].y-pts[j].x*pts[i].y;} return Math.abs(a)/2;
+}
+function slotPolygon(){
+  if(slotType==='rect'){
+    const w=+r_w.value,h=+r_h.value; return [{x:-w/2,y:0},{x:w/2,y:0},{x:w/2,y:h},{x:-w/2,y:h}];
   }
+  if(slotType==='trap'){
+    const b0=+t_b0.value,b1=+t_b1.value,h=+t_h.value;
+    return [{x:-b0/2,y:0},{x:b0/2,y:0},{x:b1/2,y:h},{x:-b1/2,y:h}];
+  }
+  if(slotType==='round'){
+    const b0=+rd_b0.value,h0=+rd_h0.value,b=+rd_b.value,h=+rd_h.value;
+    const r=b/2;
+    const h1=Math.max(0,h-h0-r);
+    const yc=h0+h1;
+    let pts=[{x:-b0/2,y:0},{x:b0/2,y:0},{x:b0/2,y:h0},{x:b/2,y:yc}];
+    for(let a=0;a<=Math.PI+1e-9;a+=Math.PI/16){ pts.push({x:r*Math.cos(a), y:yc+r*Math.sin(a)}); }
+    pts.push({x:-b0/2,y:h0});
+    return pts;
+  }
+  // segment（矩形/梯形/圆底段，自上而下）
+  const straightRight=[], arcPts=[];
+  let y=0, prevBottom=0;
+  segments.forEach((s,idx)=>{
+    let topW = s.type==='rect'? s.w : s.type==='trap'? s.w1 : 2*(s.r||1);
+    if(idx>0 && Math.abs(topW-prevBottom)>1e-6){
+      straightRight.push({x:prevBottom/2,y:y},{x:topW/2,y:y});
+    }
+    if(s.type==='rect'){
+      straightRight.push({x:topW/2,y:y},{x:topW/2,y:y+s.h});
+      prevBottom=topW; y+=s.h;
+    } else if(s.type==='trap'){
+      straightRight.push({x:s.w1/2,y:y},{x:s.w2/2,y:y+s.h});
+      prevBottom=s.w2; y+=s.h;
+    } else {
+      const r=topW/2;
+      straightRight.push({x:topW/2,y:y});
+      for(let a=0;a<=Math.PI+1e-9;a+=Math.PI/16){ arcPts.push({x:r*Math.cos(a), y:y + r*Math.sin(a)}); }
+      prevBottom=0; y+=r;
+    }
+  });
+  if(arcPts.length && straightRight.length && Math.abs(arcPts[0].x-straightRight[straightRight.length-1].x)<1e-9 && Math.abs(arcPts[0].y-straightRight[straightRight.length-1].y)<1e-9) arcPts.shift();
+  const leftStraight = straightRight.slice().reverse().map(p=>({x:-p.x,y:p.y}));
+  if(leftStraight.length){
+    const last = arcPts.length? arcPts[arcPts.length-1] : straightRight[straightRight.length-1];
+    if(Math.abs(leftStraight[0].x-last.x)<1e-9 && Math.abs(leftStraight[0].y-last.y)<1e-9) leftStraight.shift();
+  }
+  return straightRight.concat(arcPts).concat(leftStraight);
+}
+function slotArea(){ const p=slotPolygon(); return p.length>=3? shoelace(p):0; }
 
-  lenInput.addEventListener('input', calc);
-  calc();
+// 端环体积（环形截锥）：自由端直径 Do/Di，向铁心端按拔模度 α 收口，高度 h
+function frustumRing(Do,Di,h,alphaDeg){
+  if(!(Do>Di) || h<=0) return 0;
+  const t = h*Math.tan((alphaDeg||0)*Math.PI/180);   // 半径收口量
+  const Do2 = Do - 2*t, Di2 = Di - 2*t;
+  if(Do2<=0) return 0;
+  const Ro1=Do/2, Ri1=Di/2, Ro2=Do2/2, Ri2=Math.max(0,Di2)/2;
+  const V = (Math.PI*h/3)*(Ro1*Ro1+Ro1*Ro2+Ro2*Ro2 - (Ri1*Ri1+Ri1*Ri2+Ri2*Ri2));
+  return Math.max(0,V);
+}
+
+// ---------- 主计算 ----------
+function compute(){
+  const Z=+$('Z').value||0, L=+$('L').value||0;
+  let rho=+$('rho').value; if($('mat').value!=='custom') rho=+$('mat').value;
+  const aSlot=slotArea();
+  let eta=+$('eta').value; if(!(eta>=0)) eta=1; eta=Math.min(1,Math.max(0,eta));   // 铸铝填充率，限 0~1
+
+  const vSlot = aSlot*L*eta;                   // 单槽铝体积 mm³（×填充率 η）
+  const mBar  = vSlot*rho/1000*Z;              // 槽铝总重 g (mm³×g/cm³/1000)
+  // 端环 A / B（拔模→截锥）
+  let mRingA=0, mRingB=0;
+  if($('ringOn').checked){
+    mRingA = frustumRing(+$('rA_Do').value,+$('rA_Di').value,+$('rA_h').value,+$('rA_a').value)*rho/1000;
+    mRingB = frustumRing(+$('rB_Do').value,+$('rB_Di').value,+$('rB_h').value,+$('rB_a').value)*rho/1000;
+  }
+  // 风叶（拔模→切向厚收口）
+  let mFan=0;
+  if($('fanOn').checked){
+    const Nb=+$('fanN').value||0, hb=+$('fanHb').value||0, wb=+$('fanWb').value||0, tb=+$('fanTb').value||0, ab=+$('fanA').value||0;
+    const tbTop=Math.max(0, tb - hb*Math.tan(ab*Math.PI/180));
+    const vBlade=hb*wb*((tb+tbTop)/2);
+    mFan=2*Nb*vBlade*rho/1000;   // 风叶铸于两端端环，重量×2
+  }
+  // 平衡柱（拔模→截锥圆柱）
+  let mPillar=0;
+  if($('pillarOn').checked){
+    const Np=+$('pillarN').value||0, dp=+$('pillarD').value||0, hp=+$('pillarH').value||0, ap=+$('pillarA').value||0;
+    const rp=dp/2, rpTop=Math.max(0, rp - hp*Math.tan(ap*Math.PI/180));
+    const vP=(Math.PI*hp/3)*(rp*rp + rp*rpTop + rpTop*rpTop);
+    mPillar=2*Np*vP*rho/1000;   // 平衡柱铸于两端端环，重量×2
+  }
+  const mTotal=mBar+mRingA+mRingB+mFan+mPillar;
+
+  $('o_slot').textContent=aSlot.toFixed(2)+' mm²';
+  $('o_vslot').textContent=vSlot.toFixed(0)+' mm³';
+  $('o_bar').textContent=mBar.toFixed(2)+' g';
+  $('o_ringA').textContent=mRingA.toFixed(2)+' g';
+  $('o_ringB').textContent=mRingB.toFixed(2)+' g';
+  $('o_fan').textContent=mFan.toFixed(2)+' g';
+  $('o_pillar').textContent=mPillar.toFixed(2)+' g';
+  $('o_total').textContent=mTotal.toFixed(2)+' g'+(mTotal>=1000?'  ('+(mTotal/1000).toFixed(3)+' kg)':'');
+
+  let warn='';
+  if(aSlot<=0) warn='⚠ 槽面积=0，槽参数可能未填。';
+  else if(L<=0) warn='⚠ 铁心长 L 应大于 0。';
+  $('warn').textContent=warn;
+
+  drawPreview(); drawRing();
+}
+
+// ---------- 剖面预览（径向：铁心 + Z 个铝槽）----------
+function drawPreview(){
+  const D=+$('D').value||100, d=+$('d').value||20, Z=+$('Z').value||0;
+  const size=360, c=size/2, m=18;
+  const scale=(size-2*m)/D;
+  const Ro=D/2, Rs=d/2;
+  let svg=`<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">`;
+  // 铁心（外圆填充 iron）
+  svg+=`<circle cx="${c}" cy="${c}" r="${Ro*scale}" style="fill:var(--iron);fill-opacity:0.45" stroke="#8a93a3" stroke-width="1.5"/>`;
+  // 槽（铝填充）
+  const poly=slotPolygon();
+  for(let i=0;i<Z;i++){
+    const th=2*Math.PI*i/Z - Math.PI/2;
+    const ct=Math.cos(th), st=Math.sin(th);
+    let pts='';
+    poly.forEach(p=>{
+      const rpt=Ro-p.y;
+      const gx=c + (rpt*ct - p.x*st)*scale;
+      const gy=c + (rpt*st + p.x*ct)*scale;
+      pts+=`${gx.toFixed(1)},${gy.toFixed(1)} `;
+    });
+    svg+=`<polygon points="${pts}" style="fill:var(--alu);fill-opacity:0.9;stroke:var(--alu-edge)" stroke-width="0.5"/>`;
+  }
+  // 轴孔
+  svg+=`<circle cx="${c}" cy="${c}" r="${Rs*scale}" style="fill:var(--shaft)" stroke="#8a93a3" stroke-width="1"/>`;
+  svg+=`</svg>`;
+  $('svgBox').innerHTML=svg;
+}
+
+// ---------- 端环示意（两端环 + 风叶/平衡柱，均铸在端环同一端面上、错开均布）----------
+function drawRing(){
+  const box=$('ringBox');
+  const ringOn=$('ringOn').checked, fanOn=$('fanOn').checked, pillarOn=$('pillarOn').checked;
+  const anyOn = ringOn || fanOn || pillarOn;
+  if(!anyOn){ box.innerHTML=''; $('ringMsg').textContent=''; return; }
+  const size=190, m=14, cy=size/2;
+  const W=size*2+40;
+  const DoA=+$('rA_Do').value||169, DiA=+$('rA_Di').value||45;
+  const DoB=+$('rB_Do').value||169, DiB=+$('rB_Di').value||45;
+  let svg=`<svg viewBox="0 0 ${W} ${size}" xmlns="http://www.w3.org/2000/svg">`;
+  // 风叶/平衡柱均铸在端环端面上 → 端环实体必定存在；ringOn 仅决定是否计入端环自身质量
+  const drawOne=(cx,Do,Di,label)=>{
+    const sc=(size/2 - m)/(Do/2);   // 以端环外径为基准；风叶/平衡柱均在环面内，不会出框
+    const Ro=Do/2*sc, Ri=Di/2*sc;
+    const g={cx,cy,Ro,Ri,sc};
+    const Nb = fanOn ? (+$('fanN').value||0) : 0;
+    const Np = pillarOn ? (+$('pillarN').value||0) : 0;
+    // 错开均布：风叶等角排布；平衡柱塞进相邻风叶间隙中点（同一端面上互不重叠）
+    const fanAng=[], pilAng=[];
+    for(let i=0;i<Nb;i++) fanAng.push(i*2*Math.PI/Nb);
+    for(let j=0;j<Np;j++){
+      const gap = Math.round(j*Nb/Np);            // 第 j 个平衡柱落入的间隙序号
+      pilAng.push((gap + 0.5)*2*Math.PI/Nb);
+    }
+    // 1) 端环实体（圆环 Ri~Ro）
+    svg+=`<circle cx="${cx}" cy="${cy}" r="${Ro.toFixed(1)}" style="fill:var(--alu);fill-opacity:0.95;stroke:var(--alu-edge)" stroke-width="1.2"/>`;
+    svg+=`<circle cx="${cx}" cy="${cy}" r="${Ri.toFixed(1)}" style="fill:var(--bg)" stroke="#8a93a3" stroke-width="1"/>`;
+    // 2) 风叶：铸在端环端面上，由外缘 Ro 向内（圆内方向）延伸 hb 的径向梯形叶片
+    //    根部（外缘）宽 tb，叶尖（内端）按 αb 收口为 tbTop —— 与平衡柱同处于端环端面
+    if(fanOn){
+      const hb=+$('fanHb').value||0, tb=+$('fanTb').value||0, ab=+$('fanA').value||0;
+      const rInner=Math.max(Ri, Ro - hb*sc);      // 向内延伸，不超出内径
+      const tbTop=Math.max(0, tb - hb*Math.tan(ab*Math.PI/180));
+      const baseHalf=tb*sc/2, tipHalf=tbTop*sc/2;
+      fanAng.forEach(th=>{
+        const aI1=th-baseHalf/Ro,     aI2=th+baseHalf/Ro;       // 外缘端（宽 tb）
+        const aJ1=th-tipHalf/rInner,  aJ2=th+tipHalf/rInner;    // 内端（宽 tbTop，αb 收口）
+        const c1x=g.cx+Math.cos(aI1)*Ro,      c1y=g.cy+Math.sin(aI1)*Ro;
+        const c2x=g.cx+Math.cos(aI2)*Ro,      c2y=g.cy+Math.sin(aI2)*Ro;
+        const c3x=g.cx+Math.cos(aJ2)*rInner,  c3y=g.cy+Math.sin(aJ2)*rInner;
+        const c4x=g.cx+Math.cos(aJ1)*rInner,  c4y=g.cy+Math.sin(aJ1)*rInner;
+        svg+=`<polygon points="${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${c3x.toFixed(1)},${c3y.toFixed(1)} ${c4x.toFixed(1)},${c4y.toFixed(1)}" style="fill:var(--alu);fill-opacity:0.85;stroke:var(--alu-edge)" stroke-width="0.6"/>`;
+      });
+    }
+    // 3) 平衡柱：铸在端环端面上（与风叶同一平面），画在最上层
+    if(pillarOn){
+      const dp=+$('pillarD').value||0;
+      const rMid=(Ro+Ri)/2, rr=dp/2*sc;
+      pilAng.forEach(th=>{
+        const px=g.cx+Math.cos(th)*rMid, py=g.cy+Math.sin(th)*rMid;
+        svg+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${rr.toFixed(1)}" style="fill:var(--alu);fill-opacity:0.98;stroke:var(--alu-edge)" stroke-width="0.8"/>`;
+      });
+    }
+    svg+=`<text x="${cx}" y="${size-3}" style="fill:var(--muted)" font-size="11" text-anchor="middle">${label} Do${Do}/Di${Di}</text>`;
+  };
+  drawOne(size/2, DoA, DiA, '端环A');
+  drawOne(size/2 + size + 40, DoB, DiB, '端环B');
+  svg+=`</svg>`;
+  box.innerHTML=svg;
+  if((fanOn||pillarOn) && !ringOn){
+    $('ringMsg').textContent='注：风叶/平衡柱须铸在端环上，故图中已显示实体端环；当前「端环」未勾选，端环自身质量未计入总重量，勾选后计入。';
+  } else { $('ringMsg').textContent=''; }
+}
+
+// 绑定
+['Z','L','rho','D','d','eta','r_w','r_h','t_b0','t_b1','t_h','rd_b0','rd_h0','rd_b','rd_h',
+ 'ringOn','rA_Do','rA_Di','rA_h','rA_a','rB_Do','rB_Di','rB_h','rB_a',
+ 'fanOn','fanN','fanHb','fanWb','fanTb','fanA',
+ 'pillarOn','pillarN','pillarD','pillarH','pillarA'].forEach(id=>{
+  const el=$(id); if(el) el.addEventListener('input',compute);
+});
+$('mat').addEventListener('change',()=>{ if($('mat').value==='custom'){$('rho').value='2.70';} compute(); });
+
+// ---------- 参数存取（保存/读取/导出/导入）----------
+const STORE_KEY='rotor_alu_params_v1';
+function gatherState(){
+  const ids=['Z','L','rho','D','d','eta','r_w','r_h','t_b0','t_b1','t_h','rd_b0','rd_h0','rd_b','rd_h',
+    'rA_Do','rA_Di','rA_h','rA_a','rB_Do','rB_Di','rB_h','rB_a',
+    'fanN','fanHb','fanWb','fanTb','fanA','pillarN','pillarD','pillarH','pillarA'];
+  const s={slotType, segments:JSON.parse(JSON.stringify(segments)),
+    ringOn:$('ringOn').checked, fanOn:$('fanOn').checked, pillarOn:$('pillarOn').checked,
+    mat:$('mat').value, vals:{}};
+  ids.forEach(id=>{ s.vals[id]=$(id).value; });
+  return s;
+}
+function applyState(s){
+  if(!s) return;
+  if(typeof s.slotType==='string'){
+    slotType=s.slotType;
+    document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('active'));
+    const t=document.querySelector('#tabs .tab[data-t="'+slotType+'"]'); if(t) t.classList.add('active');
+    ['segment','rect','trap','round'].forEach(p=>$('panel-'+p).classList.add('hide'));
+    $('panel-'+slotType).classList.remove('hide');
+  }
+  if(Array.isArray(s.segments)){ segments=s.segments.map(o=>Object.assign({},o)); renderSegs(); }
+  if(typeof s.ringOn==='boolean') $('ringOn').checked=s.ringOn;
+  if(typeof s.fanOn==='boolean') $('fanOn').checked=s.fanOn;
+  if(typeof s.pillarOn==='boolean') $('pillarOn').checked=s.pillarOn;
+  if(typeof s.mat==='string') $('mat').value=s.mat;
+  if(s.vals) Object.keys(s.vals).forEach(id=>{ const el=$(id); if(el) el.value=s.vals[id]; });
+  compute();
+}
+$('btnSave').addEventListener('click',()=>{ localStorage.setItem(STORE_KEY, JSON.stringify(gatherState())); $('ioMsg').textContent='已保存至本地浏览器'; });
+$('btnLoad').addEventListener('click',()=>{
+  const raw=localStorage.getItem(STORE_KEY);
+  if(!raw){ $('ioMsg').textContent='没有已保存的参数'; return; }
+  try{ applyState(JSON.parse(raw)); $('ioMsg').textContent='已读取本地参数'; }
+  catch(e){ $('ioMsg').textContent='读取失败：'+e.message; }
+});
+$('btnExport').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(gatherState(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='转子充铝参数.json'; a.click(); URL.revokeObjectURL(a.href);
+  $('ioMsg').textContent='已导出参数文件';
+});
+$('btnImport').addEventListener('click',()=>$('fileInput').click());
+$('fileInput').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ applyState(JSON.parse(r.result)); $('ioMsg').textContent='已导入：'+f.name; }
+    catch(err){ $('ioMsg').textContent='导入失败：'+err.message; } };
+  r.readAsText(f); e.target.value='';
+});
+
+// 打赏按钮
+$('rewardBtn').addEventListener('click',()=>{
+  window.open('https://sgc20261009.github.io/reward-support/','_blank','noopener');
+});
+
+renderSegs(); compute();
 </script>
 </body>
 </html>
